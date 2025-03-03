@@ -33,10 +33,10 @@ public class User extends BaseEntity {
 
     private boolean isDeleted = false;
 
-    public User(String email, String password, String nickname, UserRole role) {
+    public User(String email, String password, String nickname, String role) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
-        this.role = role;
+        this.role = UserRole.of(role);
     }
 }
