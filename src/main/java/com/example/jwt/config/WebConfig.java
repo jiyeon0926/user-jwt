@@ -23,7 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class WebConfig {
 
-    private static final String[] WHITE_LIST = {"/users/signup"};
+    private static final String[] WHITE_LIST = {"/users/signup", "/users/login"};
 
     private final JwtAuthFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
@@ -37,8 +37,7 @@ public class WebConfig {
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers(WHITE_LIST).permitAll()
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                                .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE,
-                                        DispatcherType.ERROR).permitAll()
+                                .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE, DispatcherType.ERROR).permitAll()
                                 .requestMatchers("/admins/**").hasRole("ADMIN")
                                 .requestMatchers("/users/**").hasRole("USER")
                                 .anyRequest().authenticated())
