@@ -1,6 +1,6 @@
 package com.example.jwt.common.enums;
 
 public enum UserRole {
-    user,
+    USER,
     ADMIN
 }
