@@ -1,5 +1,9 @@
 package com.example.jwt.common.enums;
 
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.util.List;
+
 public enum UserRole {
     USER,
     ADMIN;
@@ -12,5 +16,9 @@ public enum UserRole {
         }
 
         throw new IllegalArgumentException("해당하는 이름의 권한을 찾을 수 없습니다: " + roleName);
+    }
+
+    public List<SimpleGrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + name()));
     }
 }
