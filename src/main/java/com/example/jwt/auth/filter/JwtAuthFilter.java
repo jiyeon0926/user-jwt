@@ -18,7 +18,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -27,13 +26,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
     private final UserDetailsService userDetailsService;
 
-    private static final List<String> WHITE_LIST = List.of("/users/signup", "/users/login");
-
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        if (isWhitelisted(request)) {
+        String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String headerPrefix = AuthenticationScheme.generateType(AuthenticationScheme.BEARER);
+
+        if (bearerToken == null || !bearerToken.startsWith(headerPrefix)) {
             filterChain.doFilter(request, response);
 
             return;
@@ -45,6 +45,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     /**
      * request를 이용해 인증을 처리
+     *
      * @param request
      */
     private void authenticate(HttpServletRequest request) {
@@ -62,6 +63,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     /**
      * request의 Authorization 헤더에서 Token 값을 추출
+     *
      * @param request
      * @return Token 값 (찾지 못하면 null)
      */
@@ -69,17 +71,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         final String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String headerPrefix = AuthenticationScheme.generateType(AuthenticationScheme.BEARER);
 
-        boolean tokenFound = StringUtils.hasText(bearerToken) && bearerToken.startsWith(headerPrefix);
-
-        if (tokenFound) {
-            return bearerToken.substring(headerPrefix.length());
-        }
-
-        return null;
+        return StringUtils.hasText(bearerToken) && bearerToken.startsWith(headerPrefix)
+                ? bearerToken.substring(headerPrefix.length())
+                : null;
     }
 
     /**
      * SecurityContext에 인증 객체를 저장
+     *
      * @param request
      * @param userDetails
      */
@@ -88,16 +87,5 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-    }
-
-    /**
-     * 화이트리스트 경로인지 확인
-     * @param request
-     * @return 화이트리스트에 포함되면 true, 포함되지 않으면 false
-     */
-    private boolean isWhitelisted(HttpServletRequest request) {
-        String path = request.getRequestURI();
-
-        return WHITE_LIST.contains(path);
     }
 }
