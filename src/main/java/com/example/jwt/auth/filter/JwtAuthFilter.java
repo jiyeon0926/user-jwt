@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -26,10 +27,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
     private final UserDetailsService userDetailsService;
 
+    private static final List<String> WHITE_LIST = List.of("/users/signup", "/users/login");
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        if (isWhitelisted(request)) {
+            filterChain.doFilter(request, response);
+
+            return;
+        }
+
         authenticate(request);
         filterChain.doFilter(request, response);
     }
@@ -79,5 +88,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    /**
+     * 화이트리스트 경로인지 확인
+     * @param request
+     * @return 화이트리스트에 포함되면 true, 포함되지 않으면 false
+     */
+    private boolean isWhitelisted(HttpServletRequest request) {
+        String path = request.getRequestURI();
+
+        return WHITE_LIST.contains(path);
     }
 }
