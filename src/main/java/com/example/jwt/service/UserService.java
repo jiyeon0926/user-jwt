@@ -3,6 +3,7 @@ package com.example.jwt.service;
 import com.example.jwt.auth.util.AuthenticationScheme;
 import com.example.jwt.auth.util.JwtProvider;
 import com.example.jwt.dto.LoginResDto;
+import com.example.jwt.dto.UserDetailResDto;
 import com.example.jwt.dto.UserResDto;
 import com.example.jwt.entity.User;
 import com.example.jwt.repository.UserRepository;
@@ -16,6 +17,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +49,30 @@ public class UserService {
                 savedUser.getCreatedAt(),
                 savedUser.getModifiedAt()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public UserDetailResDto findUserById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+
+        return new UserDetailResDto(
+                user.getId(),
+                user.getEmail(),
+                user.getNickname()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserDetailResDto> findAll() {
+        List<User> users = userRepository.findAll();
+
+        return users.stream()
+                .map(user -> new UserDetailResDto(
+                        user.getId(),
+                        user.getEmail(),
+                        user.getNickname()))
+                .collect(Collectors.toList());
     }
 
     public LoginResDto login(String email, String password) {
