@@ -6,7 +6,6 @@ import com.example.jwt.dto.LoginResDto;
 import com.example.jwt.dto.UserResDto;
 import com.example.jwt.entity.User;
 import com.example.jwt.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -50,7 +49,7 @@ public class UserService {
 
     public LoginResDto login(String email, String password) {
         User user = userRepository.findUserByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("해당 이메일이 존재하지 않습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 이메일이 존재하지 않습니다."));
 
         validatePassword(password, user.getPassword());
 
