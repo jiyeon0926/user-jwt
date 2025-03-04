@@ -4,14 +4,15 @@ import com.example.jwt.entity.User;
 import com.example.jwt.repository.UserRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -27,21 +28,20 @@ public class JwtProvider {
 
     @Getter
     @Value("${jwt.expiry-millis}")
-    private long expiryMillis;
+    private long accessExpiryMillis;
 
     private final UserRepository userRepository;
 
     /**
-     * Token 생성 후 반환
+     * AccessToken 생성 후 반환
      *
      * @param authentication
-     * @return 생성된 Token
-     * @throws EntityNotFoundException
+     * @return 생성된 AccessToken
      */
-    public String generateToken(Authentication authentication) throws EntityNotFoundException {
+    public String generateAccessToken(Authentication authentication) {
         String username = authentication.getName();
 
-        return generateTokenBy(username);
+        return generateAccessTokenBy(username);
     }
 
     public String getUsername(String token) {
@@ -65,19 +65,19 @@ public class JwtProvider {
     }
 
     /**
-     * 이메일을 이용해 Token 생성 후 반환
+     * 이메일을 이용해 AccessToken 생성 후 반환
      * - 토큰 생성에는 HS256 알고리즘을 이용
      *
      * @param email
-     * @return 생성된 Token
-     * @throws EntityNotFoundException
+     * @return 생성된 AccessToken
+     * @throws ResponseStatusException
      */
-    private String generateTokenBy(String email) throws EntityNotFoundException {
+    private String generateAccessTokenBy(String email) {
         User user = userRepository.findUserByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("해당 이메일이 존재하지 않습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 이메일이 존재하지 않습니다."));
 
         Date currentDate = new Date();
-        Date expireDate = new Date(currentDate.getTime() + expiryMillis);
+        Date expireDate = new Date(currentDate.getTime() + accessExpiryMillis);
 
         return Jwts.builder()
                 .subject(email)
