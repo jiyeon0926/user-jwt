@@ -2,8 +2,8 @@ package com.example.jwt.service;
 
 import com.example.jwt.auth.util.AuthenticationScheme;
 import com.example.jwt.auth.util.JwtProvider;
-import com.example.jwt.common.exception.CustomException;
-import com.example.jwt.common.exception.ErrorCode;
+import com.example.jwt.error.CustomException;
+import com.example.jwt.error.ErrorCode;
 import com.example.jwt.dto.LoginResDto;
 import com.example.jwt.dto.UserDetailResDto;
 import com.example.jwt.dto.UserResDto;

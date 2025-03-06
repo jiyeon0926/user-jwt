@@ -1,7 +1,7 @@
 package com.example.jwt.auth.util;
 
-import com.example.jwt.common.exception.CustomException;
-import com.example.jwt.common.exception.ErrorCode;
+import com.example.jwt.error.CustomException;
+import com.example.jwt.error.ErrorCode;
 import com.example.jwt.entity.User;
 import com.example.jwt.repository.UserRepository;
 import io.jsonwebtoken.*;
