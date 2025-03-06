@@ -87,8 +87,9 @@ public class UserService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String accessToken = jwtProvider.generateAccessToken(authentication);
+        String refreshToken = jwtProvider.generateRefreshToken(authentication);
 
-        return new LoginResDto(AuthenticationScheme.BEARER.getName(), accessToken);
+        return new LoginResDto(AuthenticationScheme.BEARER.getName(), accessToken, refreshToken);
     }
 
     private void validatePassword(String rawPassword, String encodedPassword) throws IllegalArgumentException {
