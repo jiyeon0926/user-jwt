@@ -2,13 +2,14 @@ package com.example.jwt.service;
 
 import com.example.jwt.auth.util.AuthenticationScheme;
 import com.example.jwt.auth.util.JwtProvider;
+import com.example.jwt.common.exception.CustomException;
+import com.example.jwt.common.exception.ErrorCode;
 import com.example.jwt.dto.LoginResDto;
 import com.example.jwt.dto.UserDetailResDto;
 import com.example.jwt.dto.UserResDto;
 import com.example.jwt.entity.User;
 import com.example.jwt.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,7 +17,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +34,7 @@ public class UserService {
     public UserResDto signup(String email, String password, String nickname, String role) {
         userRepository.findUserByEmail(email)
                 .ifPresent(user -> {
-                    throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다.");
+                    throw new CustomException(ErrorCode.EMAIL_EXISTS);
                 });
 
         String encodedPassword = passwordEncoder.encode(password);
@@ -54,7 +54,11 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserDetailResDto findUserById(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if (user.isDeleted()) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
 
         return new UserDetailResDto(
                 user.getId(),
@@ -65,7 +69,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<UserDetailResDto> findAll() {
-        List<User> users = userRepository.findAll();
+        List<User> users = userRepository.findUsersByIsDeleted(false);
 
         return users.stream()
                 .map(user -> new UserDetailResDto(
@@ -78,17 +82,17 @@ public class UserService {
     @Transactional
     public void deleteUser(Long userId, String bearerToken) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         String headerPrefix = AuthenticationScheme.generateType(AuthenticationScheme.BEARER);
         String accessToken = bearerToken.substring(headerPrefix.length());
 
         String email = jwtProvider.getUsername(accessToken);
         User user = userRepository.findUserByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         if (!user.getId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "사용자가 일치하지 않습니다.");
+            throw new CustomException(ErrorCode.USER_NOT_MATCH);
         }
 
         userRepository.delete(user);
@@ -96,7 +100,11 @@ public class UserService {
 
     public LoginResDto login(String email, String password) {
         User user = userRepository.findUserByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 이메일이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.EMAIL_NOT_FOUND));
+
+        if (user.isDeleted()) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
 
         validatePassword(password, user.getPassword());
 
@@ -111,11 +119,11 @@ public class UserService {
         return new LoginResDto(AuthenticationScheme.BEARER.getName(), accessToken, refreshToken);
     }
 
-    private void validatePassword(String rawPassword, String encodedPassword) throws IllegalArgumentException {
+    private void validatePassword(String rawPassword, String encodedPassword) {
         boolean notValid = !passwordEncoder.matches(rawPassword, encodedPassword);
 
         if (notValid) {
-            throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
+            throw new CustomException(ErrorCode.PASSWORD_BAD_REQUEST);
         }
     }
 }
