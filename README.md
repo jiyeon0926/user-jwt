@@ -21,12 +21,16 @@
 - Content-Type : application/json
 - Authorization : -
 
+<br>
+
 |필드명|타입|필수 여부|설명|
 |---|---|:---:|---|
 |email|String|Y|이메일|
 |password|String|Y|비밀번호|
 |nickname|String|Y|닉네임|
 |role|String|Y|권한|
+
+<br>
 
 ```
 {
@@ -44,6 +48,8 @@
 |400 Bad Request|잘못된 요청을 보낼 경우|
 |409 Conflict|동일한 이메일이 존재할 경우|
 
+<br>
+
 |필드명|타입|설명|
 |---|---|---|
 |id|Long|사용자 고유 식별자|
@@ -52,6 +58,8 @@
 |role|String|권한|
 |createdAt|LocalDateTime|생성 일자|
 |modifiedAt|LocalDateTime|수정 일자|
+
+<br>
 
 ```
 {
@@ -77,14 +85,18 @@
 
 ### Request
 - Method : POST
-- URL : /users/signup
+- URL : /users/login
 - Content-Type : application/json
 - Authorization : -
+
+<br>
 
 |필드명|타입|필수 여부|설명|
 |---|---|:---:|---|
 |email|String|Y|이메일|
 |password|String|Y|비밀번호|
+
+<br>
 
 ```
 {
@@ -94,19 +106,26 @@
 ```
 
 ### Response
-- Set-Cookie: 	
-refreshToken=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMUBuYXZlci5jb20iLCJpYXQiOjE3NDEyOTQwMDMsImV4cCI6MTc0MTI5NDMwM30.q5XvxJuJDvfxX-vX8IwCLyJTHw92oO0niFvLh-g-bSA; Path=/; Max-Age=300; Expires=Thu, 06 Mar 2025 20:55:23 GMT; Secure; HttpOnly
-
 |상태 코드|설명|
 |---|---|
 |200 OK|로그인 성공|
 |404 Not Found|사용자 이메일이 존재하지 않거나 탈퇴한 사용자인 경우|
+
+<br>
 
 |필드명|타입|설명|
 |---|---|---|
 |tokenAuthScheme|String|Token Type|
 |accessToken|String|Access Token 값|
 |refreshToken|String|Refresh Token 값|
+
+<br>
+
+|Key|Value|
+|---|---|
+|Set-Cookie|refreshToken=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMUBuYXZlci5jb20iLCJpYXQiOjE3NDEyOTQwMDMsImV4cCI6MTc0MTI5NDMwM30.q5XvxJuJDvfxX-vX8IwCLyJTHw92oO0niFvLh-g-bSA; Path=/; Max-Age=300; Expires=Thu, 06 Mar 2025 20:55:23 GMT; Secure; HttpOnly|
+
+<br>
 
 ```
 {
@@ -135,10 +154,158 @@ refreshToken=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMUBuYXZlci5jb20iLCJpYXQiOjE3ND
 ```
 
 ## 3️⃣ 로그아웃
+
+### Request
+- Method : POST
+- URL : /users/logout
+- Content-Type : -
+- Authorization : Access Token
+
+### Response
+|상태 코드|설명|
+|---|---|
+|200 OK|로그아웃 성공|
+|401 Unauthorized|Access Token이 만료될 경우|
+
+<br>
+
+|Key|Value|
+|---|---|
+|Set-Cookie|refreshToken=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; HttpOnly|
+
 ## 4️⃣ 사용자 단 건 조회
+
+### Request
+- Method : GET
+- URL : /users/{userId}
+- Content-Type : -
+- Authorization : Access Token
+
+### Response
+|상태 코드|설명|
+|---|---|
+|200 OK|사용자 단 건 조회 성공|
+|401 Unauthorized|Access Token이 만료될 경우|
+|404 Not Found|사용자가 존재하지 않을 경우|
+
+<br>
+
+|필드명|타입|설명|
+|---|---|---|
+|id|Long|사용자 고유 식별자|
+|email|String|이메일|
+|nickname|String|닉네임|
+
+<br>
+
+```
+{
+    "id": 1,
+    "email": "user1@naver.com",
+    "nickname": "jiyeon"
+}
+```
+```
+{
+    "timestamp": "2025-03-07T06:20:15.7888725",
+    "status": 404,
+    "error": "Not Found",
+    "code": "USER_NOT_FOUND",
+    "message": "사용자를 찾을 수 없습니다."
+}
+```
+
 ## 5️⃣ 사용자 전체 조회
+
+### Request
+- Method : GET
+- URL : /users/
+- Content-Type : -
+- Authorization : Access Token
+
+### Response
+|상태 코드|설명|
+|---|---|
+|200 OK|사용자 전체 조회 성공|
+|401 Unauthorized|Access Token이 만료될 경우|
+
+<br>
+
+|필드명|타입|설명|
+|---|---|---|
+|id|Long|사용자 고유 식별자|
+|email|String|이메일|
+|nickname|String|닉네임|
+
+<br>
+
+```
+[
+    {
+        "id": 1,
+        "email": "user1@naver.com",
+        "nickname": "jiyeon"
+    },
+    {
+        "id": 2,
+        "email": "user2@naver.com",
+        "nickname": "jiyeon"
+    }
+]
+```
+
 ## 6️⃣ 회원탈퇴
+
+### Request
+- Method : DELETE
+- URL : /users/{userId}
+- Content-Type : -
+- Authorization : Access Token
+
+### Response
+|상태 코드|설명|
+|---|---|
+|204 No Content|회원탈퇴 성공 (응답 본문 없음)|
+|401 Unauthorized|Access Token이 만료될 경우|
+|404 Not Found|사용자가 존재하지 않을 경우|
+
+<br>
+
+|Key|Value|
+|---|---|
+|Set-Cookie|refreshToken=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; HttpOnly|
+
+<br>
+
+```
+{
+    "timestamp": "2025-03-07T06:25:23.7202904",
+    "status": 404,
+    "error": "Not Found",
+    "code": "USER_NOT_FOUND",
+    "message": "사용자를 찾을 수 없습니다."
+}
+```
+
 ## 7️⃣ 관리자
+
+### Request
+- Method : GET
+- URL : /admins/access
+- Content-Type : -
+- Authorization : Access Token
+
+### Response
+|상태 코드|설명|
+|---|---|
+|200 OK|관리자 권한만 접근 허용|
+|401 Unauthorized|Access Token이 만료되거나 관리자 권한이 아닐 경우|
+
+<br>
+
+```
+관리자만 접근할 수 있습니다.
+```
 
 ## 8️⃣ Access Token 갱신
 
@@ -160,10 +327,14 @@ refreshToken=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMUBuYXZlci5jb20iLCJpYXQiOjE3ND
 |401 Unauthorized|Refresh Token이 존재하지 않거나, 유효하지 않을 경우|
 |404 Not Found|사용자 이메일이 존재하지 않을 경우|
 
+<br>
+
 |필드명|타입|설명|
 |---|---|---|
 |tokenAuthScheme|String|Token Type|
 |accessToken|String|새롭게 발급된 Access Token 값|
+
+<br>
 
 ```
 {
