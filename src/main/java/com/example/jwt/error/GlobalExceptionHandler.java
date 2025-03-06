@@ -1,4 +1,4 @@
-package com.example.jwt.common.exception;
+package com.example.jwt.error;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;

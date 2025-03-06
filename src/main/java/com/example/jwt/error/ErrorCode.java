@@ -1,4 +1,4 @@
-package com.example.jwt.common.exception;
+package com.example.jwt.error;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
