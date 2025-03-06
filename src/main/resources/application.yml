@@ -2,12 +2,12 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/jwt
-    username: root
-    password: 1234
+    username: ${USERNAME}
+    password: ${PASSWORD}
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: ${DDL_AUTO}
 
     show-sql: true
     properties:
@@ -15,9 +15,9 @@ spring:
         format_sql: true
 
 jwt:
-  secret: ABE277B5030563942667C73D4452C0969EAECC261F471E5A676AA89B3E8FB99B
-  expiry-millis: 180000 # test-access-millis: 3m
-  refresh-expiry-millis: 300000 # test-refresh-millis: 5m
+  secret: ${JWT_SECRET}
+  expiry-millis: ${JWT_ACCESS_EXPIRY_MILLIS}
+  refresh-expiry-millis: ${JWT_REFRESH_EXPIRY_MILLIS}
 
 logging:
   level:
