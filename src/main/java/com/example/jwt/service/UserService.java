@@ -75,6 +75,25 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public void deleteUser(Long userId, String bearerToken) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+
+        String headerPrefix = AuthenticationScheme.generateType(AuthenticationScheme.BEARER);
+        String accessToken = bearerToken.substring(headerPrefix.length());
+
+        String email = jwtProvider.getUsername(accessToken);
+        User user = userRepository.findUserByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+
+        if (!user.getId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "사용자가 일치하지 않습니다.");
+        }
+
+        userRepository.delete(user);
+    }
+
     public LoginResDto login(String email, String password) {
         User user = userRepository.findUserByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 이메일이 존재하지 않습니다."));

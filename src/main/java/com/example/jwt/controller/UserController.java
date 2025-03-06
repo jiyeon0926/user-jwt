@@ -1,11 +1,15 @@
 package com.example.jwt.controller;
 
+import com.example.jwt.auth.util.CookieUtil;
 import com.example.jwt.dto.UserDetailResDto;
 import com.example.jwt.dto.UserResDto;
 import com.example.jwt.dto.UserSignupReqDto;
 import com.example.jwt.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +22,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final CookieUtil cookieUtil;
 
     // 회원가입
     @PostMapping("/signup")
@@ -45,5 +50,21 @@ public class UserController {
         List<UserDetailResDto> findAll = userService.findAll();
 
         return new ResponseEntity<>(findAll, HttpStatus.OK);
+    }
+
+    // 회원탈퇴
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId,
+                                           HttpServletRequest request,
+                                           HttpServletResponse response) {
+        String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+        userService.deleteUser(userId, bearerToken);
+
+        String name = "refreshToken";
+        String path = "/";
+
+        cookieUtil.deleteCookie(response, name, path);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
