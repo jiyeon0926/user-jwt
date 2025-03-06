@@ -2,16 +2,16 @@ package com.example.jwt.service;
 
 import com.example.jwt.auth.util.AuthenticationScheme;
 import com.example.jwt.auth.util.JwtProvider;
+import com.example.jwt.common.exception.CustomException;
+import com.example.jwt.common.exception.ErrorCode;
 import com.example.jwt.dto.AccessTokenResDto;
 import com.example.jwt.entity.User;
 import com.example.jwt.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -24,12 +24,12 @@ public class TokenService {
 
     public AccessTokenResDto getNewAccessToken(String refreshToken) {
         if (refreshToken == null || refreshToken.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh 토큰이 존재하지 않습니다.");
+            throw new CustomException(ErrorCode.REFRESH_UNAUTHORIZED);
         }
 
         String email = jwtProvider.getUsername(refreshToken);
         User user = userRepository.findUserByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 이메일이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.EMAIL_NOT_FOUND));
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(email, null, List.of(new SimpleGrantedAuthority(user.getRole().name())));

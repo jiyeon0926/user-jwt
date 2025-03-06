@@ -1,5 +1,7 @@
 package com.example.jwt.auth.util;
 
+import com.example.jwt.common.exception.CustomException;
+import com.example.jwt.common.exception.ErrorCode;
 import com.example.jwt.entity.User;
 import com.example.jwt.repository.UserRepository;
 import io.jsonwebtoken.*;
@@ -8,7 +10,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -109,7 +110,7 @@ public class JwtProvider {
      */
     private String generateAccessTokenBy(String email) {
         User user = userRepository.findUserByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 이메일이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.EMAIL_NOT_FOUND));
 
         Date currentDate = new Date();
         Date expireDate = new Date(currentDate.getTime() + accessExpiryMillis);
