@@ -30,11 +30,25 @@ public class JwtProvider {
     @Value("${jwt.expiry-millis}")
     private long accessExpiryMillis;
 
+    @Getter
+    @Value("${jwt.refresh-expiry-millis}")
+    private long refreshExpiryMillis;
+
     private final UserRepository userRepository;
 
     /**
+     * RefreshToken 생성 후 반환
+     * @param authentication
+     * @return 생성된 RefreshToken
+     */
+    public String generateRefreshToken(Authentication authentication) {
+        String username = authentication.getName();
+
+        return generateRefreshTokenBy(username);
+    }
+
+    /**
      * AccessToken 생성 후 반환
-     *
      * @param authentication
      * @return 생성된 AccessToken
      */
@@ -48,6 +62,12 @@ public class JwtProvider {
         Claims claims = getClaims(token);
 
         return claims.getSubject();
+    }
+
+    public boolean isAccessToken(String token) {
+        Claims claims = getClaims(token);
+
+        return claims.containsKey("role");
     }
 
     public boolean validToken(String token) throws JwtException {
@@ -65,9 +85,24 @@ public class JwtProvider {
     }
 
     /**
-     * 이메일을 이용해 AccessToken 생성 후 반환
-     * - 토큰 생성에는 HS256 알고리즘을 이용
-     *
+     * 이메일을 이용해 RefreshToken 생성 후 반환
+     * @param email
+     * @return 생성된 RefreshToken
+     */
+    private String generateRefreshTokenBy(String email) {
+        Date currentDate = new Date();
+        Date expireDate = new Date(currentDate.getTime() + refreshExpiryMillis);
+
+        return Jwts.builder()
+                .subject(email)
+                .issuedAt(currentDate)
+                .expiration(expireDate)
+                .signWith(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256)
+                .compact();
+    }
+
+    /**
+     * 이메일을 이용해 AccessToken 생성 후 반환 - 토큰 생성에는 HS256 알고리즘을 이용
      * @param email
      * @return 생성된 AccessToken
      * @throws ResponseStatusException

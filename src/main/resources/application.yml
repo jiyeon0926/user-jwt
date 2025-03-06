@@ -7,7 +7,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
 
     show-sql: true
     properties:
@@ -16,7 +16,8 @@ spring:
 
 jwt:
   secret: ABE277B5030563942667C73D4452C0969EAECC261F471E5A676AA89B3E8FB99B
-  expiry-millis: 180000
+  expiry-millis: 180000 # test-access-millis: 3m
+  refresh-expiry-millis: 300000 # test-refresh-millis: 5m
 
 logging:
   level:

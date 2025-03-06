@@ -45,13 +45,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     /**
      * request를 이용해 인증을 처리
-     *
      * @param request
      */
     private void authenticate(HttpServletRequest request) {
         String token = getTokenFromRequest(request);
 
-        if (!jwtProvider.validToken(token)) {
+        if (!jwtProvider.validToken(token) || !jwtProvider.isAccessToken(token)) {
             return;
         }
 
@@ -63,7 +62,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     /**
      * request의 Authorization 헤더에서 Token 값을 추출
-     *
      * @param request
      * @return Token 값 (찾지 못하면 null)
      */
@@ -78,7 +76,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     /**
      * SecurityContext에 인증 객체를 저장
-     *
      * @param request
      * @param userDetails
      */
