@@ -35,4 +35,14 @@ public class LoginController {
 
         return new ResponseEntity<>(login, HttpStatus.OK);
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletResponse response) {
+        String name = "refreshToken";
+        String path = "/";
+
+        cookieUtil.deleteCookie(response, name, path);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
