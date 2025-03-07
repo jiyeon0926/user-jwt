@@ -1,7 +1,19 @@
+# 🌱 배경
+Session과 JWT(JSON Web Token)는 인증을 처리하는 웹 애플리케이션의 주요 방식입니다. <br>
+Session은 서버에 Session 정보를 저장하고 관리하며, JWT는 클라이언트가 Token을 저장해 인증 정보를 전달합니다. <br>
+이번 프로젝트에서는 JWT를 활용해 인증/인가 방식을 구현하여 Session과 JWT의 차이점을 명확히 이해하고자 합니다.
+- [Session을 활용한 사용자 기능 구현](https://github.com/jiyeon0926/user-session)
+
+# 💭 고민한 부분
+Access Token을 갱신하려면 Refresh Token이 필요하므로, Refresh Token은 서버 또는 클라이언트에 저장해야 합니다. <br>
+Redis를 사용하지 않고, Refresh Token을 어떻게 저장해야 할지 고민됐습니다. <br>
+여러 GitHub Repository 및 블로그를 참고한 결과, Cookie를 활용하여 인증하는 방법을 고려하게 되었습니다.
+- HttpOnly Cookie는 JavaScript를 통한 접근이 불가능하기 때문에 XSS 공격으로부터 보호 가능
+- Cookie는 클라이언트 측에서 관리되므로 서버 부담 감소
+
 # 🎯 목표
 - Spring Security 및 JWT(JSON Web Token)를 사용해 인증/인가에 대한 개념을 보완하기
 - Access Token 및 Refresh Token 구현하기
-- Cookie 활용하기
 - JWT 검증 및 Access Token 갱신하기
 
 # 🛠 기술 스택
@@ -10,22 +22,6 @@
 - 프레임워크: Spring Boot 3.4.3
 - 인증/인가: Spring Security
 - 데이터베이스: MySQL
-
-# 📝 설명
-
-## 🌱 배경
-Session과 JWT(JSON Web Token)는 인증을 처리하는 웹 애플리케이션의 주요 방식입니다. <br>
-Session은 서버에 Session 정보를 저장하고 관리하며, JWT는 클라이언트가 Token을 저장해 인증 정보를 전달합니다. <br>
-이번 프로젝트에서는 JWT를 활용해 인증/인가 방식을 구현하여 Session과 JWT의 차이점을 명확히 이해하고자 합니다.
-- [Session을 활용한 사용자 기능 구현](https://github.com/jiyeon0926/user-session)
-
-## 💭 고민한 부분
-Refresh Token은 Access Token을 갱신하는 데 사용되며, Access Token은 인증을 위한 용도로 사용됩니다. <br>
-Refresh Token을 보유해야만 Access Token을 갱신할 수 있으므로, Refresh Token은 저장되어야 합니다. <br><br>
-Redis를 사용하지 않고, Refresh Token을 어떻게 저장해야 할지 고민됐습니다. <br>
-여러 GitHub Repository 및 블로그를 참고한 결과, Header에 Cookie를 사용하여 저장하는 방법을 고려하게 되었습니다.
-- HttpOnly Cookie는 JavaScript를 통한 접근이 불가능하기 때문에 XSS 공격으로부터 보호 가능
-- Cookie는 클라이언트 측에서 관리되므로 서버 부담 감소
 
 # 📄 API 명세서
 
