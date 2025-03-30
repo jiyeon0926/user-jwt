@@ -2,6 +2,7 @@
 Session과 JWT(JSON Web Token)는 인증을 처리하는 웹 애플리케이션의 주요 방식입니다. <br>
 Session은 서버에 Session 정보를 저장하고 관리하며, JWT는 클라이언트가 Token을 저장해 인증 정보를 전달합니다. <br>
 이번 프로젝트에서는 JWT를 활용해 인증/인가 방식을 구현하여 Session과 JWT의 차이점을 명확히 이해하고자 합니다.
+향후 Redis를 사용하지 않은 Refresh Token 구현 방식과 Redis를 활용한 방식의 차이를 비교할 예정입니다.
 - [Session을 활용한 사용자 기능 구현](https://github.com/jiyeon0926/user-session)
 
 # 🎯 목표
