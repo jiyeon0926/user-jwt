@@ -4,17 +4,17 @@ Session은 서버에 Session 정보를 저장하고 관리하며, JWT는 클라�
 이번 프로젝트에서는 JWT를 활용해 인증/인가 방식을 구현하여 Session과 JWT의 차이점을 명확히 이해하고자 합니다.
 - [Session을 활용한 사용자 기능 구현](https://github.com/jiyeon0926/user-session)
 
+# 🎯 목표
+- Spring Security 및 JWT(JSON Web Token)를 사용해 인증/인가에 대한 개념을 보완하기
+- Redis를 사용하지 않고, Refresh Token 구현하기
+- JWT 검증 및 Access Token 갱신하기
+
 # 💭 고민한 부분
 Access Token을 갱신하려면 Refresh Token이 필요하므로, Refresh Token은 서버 또는 클라이언트에 저장해야 합니다. <br>
 Redis를 사용하지 않고, Refresh Token을 어떻게 저장해야 할지 고민됐습니다. <br>
 여러 GitHub Repository 및 블로그를 참고한 결과, Cookie를 활용하여 인증하는 방법을 고려하게 되었습니다.
 - HttpOnly Cookie는 JavaScript를 통한 접근이 불가능하기 때문에 XSS 공격으로부터 보호 가능
 - Cookie는 클라이언트 측에서 관리되므로 서버 부담 감소
-
-# 🎯 목표
-- Spring Security 및 JWT(JSON Web Token)를 사용해 인증/인가에 대한 개념을 보완하기
-- Access Token 및 Refresh Token 구현하기
-- JWT 검증 및 Access Token 갱신하기
 
 # 🛠 기술 스택
 - IDE: IntelliJ
