@@ -18,11 +18,10 @@ Redis를 사용하지 않고, Refresh Token을 어떻게 저장해야 할지 고
 - Cookie는 클라이언트 측에서 관리되므로 서버 부담 감소
 
 # 🛠 기술 스택
-- IDE: IntelliJ
-- 언어: Java 21
-- 프레임워크: Spring Boot 3.4.3
-- 인증/인가: Spring Security
-- 데이터베이스: MySQL
+- Java 21
+- Spring Boot 3.4.3
+- Spring Security
+- MySQL
 
 # 📄 API 명세서
 
